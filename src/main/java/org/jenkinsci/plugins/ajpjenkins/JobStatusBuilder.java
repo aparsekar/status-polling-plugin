@@ -5,8 +5,6 @@ import com.cloudbees.plugins.credentials.CredentialsMatcher;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.cloudbees.plugins.credentials.domains.SchemeRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.Extension;
 import hudson.Launcher;
@@ -33,7 +31,6 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 /**
  * Sample {@link Builder}.
@@ -76,10 +73,9 @@ public class JobStatusBuilder extends Builder {
     public String getCredentialsId() {
         return credentialsId;
     }
+
     public StandardUsernameCredentials getCredentials() {
-        String credentialsId = this.credentialsId == null
-                ? (this.credentials == null ? null : this.credentials.getId())
-                : this.credentialsId;
+        String credentialsId = (this.credentialsId == null) ? (this.credentials == null ? null : this.credentials.getId()) : this.credentialsId;
         try {
             StandardUsernameCredentials credentials = CredentialsProvider.lookupCredentials(StandardUsernameCredentials.class, Jenkins.getInstance(), ACL.SYSTEM, null, null).get(0);
             if (credentials != null) {
@@ -100,8 +96,7 @@ public class JobStatusBuilder extends Builder {
             if (urlEndPoint.startsWith("https")) {
                 protocol = "https";
             }
-            List<StandardUsernameCredentials> credentials = com.cloudbees.plugins.credentials.CredentialsProvider.lookupCredentials(StandardUsernameCredentials.class, Jenkins.getInstance(), ACL.SYSTEM, null, null);
-            StandardUsernameCredentials standardUsernameCredentials = credentials.get(0);
+            StandardUsernameCredentials standardUsernameCredentials = getCredentials();
             String user = standardUsernameCredentials.getUsername();
             String pass = ((UsernamePasswordCredentialsImpl) standardUsernameCredentials).getPassword().getPlainText();
             HttpURLConnection urlConnection;
