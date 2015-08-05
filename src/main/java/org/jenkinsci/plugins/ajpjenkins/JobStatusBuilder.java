@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.ajpjenkins;
 
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsMatcher;
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameListBoxModel;
@@ -47,7 +48,6 @@ import java.net.URL;
  * When a build is performed, the {@link #perform(AbstractBuild, Launcher, BuildListener)}
  * method will be invoked.
  *
- * @author Kohsuke Kawaguchi
  */
 public class JobStatusBuilder extends Builder {
     private final String credentialsId;
@@ -59,7 +59,7 @@ public class JobStatusBuilder extends Builder {
     public JobStatusBuilder(String urlEndPoint, Integer pollingInterval, String credentialsId) {
         this.urlEndPoint = urlEndPoint;
         this.pollingInterval = pollingInterval;
-        this.credentialsId = credentials == null ? null : credentials.getId();
+        this.credentialsId = credentialsId;
     }
 
     public String getUrlEndPoint() {
@@ -77,7 +77,11 @@ public class JobStatusBuilder extends Builder {
     public StandardUsernameCredentials getCredentials() {
         String credentialsId = (this.credentialsId == null) ? (this.credentials == null ? null : this.credentials.getId()) : this.credentialsId;
         try {
-            StandardUsernameCredentials credentials = CredentialsProvider.lookupCredentials(StandardUsernameCredentials.class, Jenkins.getInstance(), ACL.SYSTEM, null, null).get(0);
+            StandardUsernameCredentials credentials = CredentialsMatchers.firstOrNull(
+                    CredentialsProvider
+                            .lookupCredentials(StandardUsernameCredentials.class, Jenkins.getInstance(), ACL.SYSTEM, null, null),
+                    CredentialsMatchers.withId(credentialsId)
+            );
             if (credentials != null) {
                 this.credentials = credentials;
                 return credentials;
@@ -173,6 +177,22 @@ public class JobStatusBuilder extends Builder {
                 throws IOException, ServletException {
             if (value.length() == 0) {
                 return FormValidation.error("Please set a url end point");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckCredentialsId(@QueryParameter String value)
+                throws IOException, ServletException {
+            if (value.length() == 0) {
+                return FormValidation.error("Please set credentials");
+            }
+            return FormValidation.ok();
+        }
+
+        public FormValidation doCheckPollingInterval(@QueryParameter String value)
+                throws IOException, ServletException {
+            if (value.length() == 0) {
+                return FormValidation.error("Please set credentials");
             }
             return FormValidation.ok();
         }
