@@ -176,7 +176,7 @@ public class JobStatusBuilder extends Builder {
         public FormValidation doCheckUrlEndPoint(@QueryParameter String value)
                 throws IOException, ServletException {
             if (value.length() == 0) {
-                return FormValidation.error("Please set a url end point");
+                return FormValidation.error("Please set a Url end point");
             }
             return FormValidation.ok();
         }
@@ -184,7 +184,7 @@ public class JobStatusBuilder extends Builder {
         public FormValidation doCheckCredentialsId(@QueryParameter String value)
                 throws IOException, ServletException {
             if (value.length() == 0) {
-                return FormValidation.error("Please set credentials");
+                return FormValidation.error("Please set Credentials");
             }
             return FormValidation.ok();
         }
@@ -192,7 +192,7 @@ public class JobStatusBuilder extends Builder {
         public FormValidation doCheckPollingInterval(@QueryParameter String value)
                 throws IOException, ServletException {
             if (value.length() == 0) {
-                return FormValidation.error("Please set credentials");
+                return FormValidation.error("Please set Polling interval");
             }
             return FormValidation.ok();
         }
